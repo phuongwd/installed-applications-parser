@@ -51,6 +51,19 @@ function extractValue(text, prefix) {
   return match ? match[1].trim() : null;
 }
 
+function extractDeveloperID(text) {
+  // Regular expression to capture the name and ID in parentheses
+  const regex =
+    /(Developer ID Application|Apple Development):\s*([^()]+)\s*\(([A-Z0-9]+)\)/;
+
+  // Execute the regular expression on the text
+  const match = text.match(regex);
+
+  // Return the captured developer name and ID if found
+  return match ? `${match[2].trim()} (${match[3]})` : null;
+}
+
+
 function extractLastModified(data) {
   const regex = /Last Modified:\s*(\d{1,2}\/\d{1,2}\/\d{2}),\s*(\d{2}:\d{2})/;
   const match = data.match(regex);
@@ -96,7 +109,8 @@ async function parseInstalledApplications(filePath) {
     } else if (line.startsWith("Version:")) {
       currentApp.Version = extractValue(line, "Version") || "N/A";
     } else if (line.startsWith("Signed by:")) {
-      currentApp.Vendor = extractValue(line, "Signed by");
+      const signedBy = extractValue(line, "Signed by");
+      currentApp.Vendor = extractDeveloperID(signedBy) || signedBy;
     } else if (line.startsWith("Last Modified:")) {
       const lastModified = extractLastModified(line);
       currentApp.Used = determineUsageCategory(lastModified);
@@ -119,7 +133,19 @@ async function parseInstalledApplications(filePath) {
 
 async function exportToExcel(data, filePath) {
   const workbook = xlsx.utils.book_new();
-  const worksheet = xlsx.utils.json_to_sheet(data);
+
+  // Map data to include custom headers
+  const customData = data.map((app) => ({
+    ID: app.ID,
+    Name: app.Name,
+    Version: app.Version,
+    Vendor: app.Vendor,
+    Used: app.Used,
+    "License Type": app["License Type"],
+    OS: 'macOS'
+  }));
+
+  const worksheet = xlsx.utils.json_to_sheet(customData);
   xlsx.utils.book_append_sheet(workbook, worksheet, "Applications");
   xlsx.writeFile(workbook, filePath);
   console.log(`Data exported successfully to ${filePath}`);
