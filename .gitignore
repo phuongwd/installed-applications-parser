@@ -1,0 +1,21 @@
+# Node modules
+node_modules/
+
+# Output files
+Installed_Applications.txt
+Installed_Applications.xlsx
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Other
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

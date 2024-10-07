@@ -1,0 +1,14 @@
+{
+  "name": "installed-applications-parser",
+  "version": "1.0.0",
+  "description": "A Node.js script to parse installed applications and export to Excel.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Phuong To",
+  "license": "MIT",
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
+}
